@@ -2,7 +2,16 @@
 
 // Validate functions
 function validateX($xVal) {
-  return isset($xVal);
+
+  //return isset($xVal);
+  if(isset($xVal))
+  	{
+  		if ($xVal == -2 || $xVal == -1.5 || $xVal == -1 || $xVal == -0.5 || $xVal == 0 || $xVal == 0.5 || $xVal == 1 || $xVal == 1.5 || $xVal == 2)
+  			return true;
+  		else
+  			return false;
+  	}
+  	return false;
 }
 
 function validateY($yVal) {
@@ -45,6 +54,27 @@ function checkHit($xVal, $yVal, $rVal) {
     checkCircle($xVal, $yVal, $rVal);
 }
 
+function addJSONElementToArray($jsonElem) {
+    array_push($_SESSION["jsonElems"], $jsonElem);
+}
+
+function echoJSONArray() {
+    echo '{';
+    for ($i = 0; $i < count($_SESSION["jsonElems"]); $i++) {
+        echo $jsonElem;
+        if ($i != count($_SESSION["jsonElems"]) - 1) {
+            echo ',';
+        }
+    }
+    echo '}';
+}
+
+session_start();
+
+if(!isset($_SESSION["jsonElems"])) {
+    $_SESSION["jsonElems"] = array();
+}
+
 // Main logic
 $xVal = $_POST['xval'];
 $yVal = $_POST['yval'];
@@ -60,7 +90,7 @@ $converted_isHit = $isHit ? 'true' : 'false';
 $currentTime = date('H:i:s', time()-$timezoneOffset*60);
 $executionTime = round(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 7);
 
-$jsonData = '{' .
+$jsonData = '[' .
   "\"validate\":$converted_isValid," .
   "\"xval\":\"$xVal\"," .
   "\"yval\":\"$yVal\"," .
@@ -68,6 +98,9 @@ $jsonData = '{' .
   "\"curtime\":\"$currentTime\"," .
   "\"exectime\":\"$executionTime\"," .
   "\"hitres\":$converted_isHit" .
-  "}";
+  "]";
 
-echo $jsonData;
+addJSONElementToArray($jsonData);
+echoJSONArray();
+
+session_write_close();
